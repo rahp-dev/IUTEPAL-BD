@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Cliente y Venta</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+  <div class="w-full max-w-6xl bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">{{message}}</h1>
+
+    <!-- Botones para mostrar/ocultar formularios -->
+    <div class="mb-6 flex justify-center space-x-4">
+      <button id="toggle-client-form" class="bg-blue-500 text-white p-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out">Formulario Cliente</button>
+      <button id="toggle-sale-form" class="bg-green-500 text-white p-3 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-150 ease-in-out">Formulario Venta</button>
+    </div>
+
+    <!-- Formulario combinado de Cliente y Venta -->
+    <form action="/views/create" method="post" class="space-y-6">
+      <!-- Datos del Cliente -->
+      <div id="client-form" class="mb-8 hidden">
+        <fieldset class="border border-gray-200 p-6 rounded-lg">
+          <legend class="text-2xl font-semibold mb-6 text-gray-700">Datos del Cliente</legend>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label for="nombre" class="block mb-2 text-sm font-medium text-gray-700">Nombre:</label>
+              <input type="text" id="nombre" name="nombre" required class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+            <div>
+              <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email:</label>
+              <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+            <div>
+              <label for="telefono" class="block mb-2 text-sm font-medium text-gray-700">Teléfono:</label>
+              <input type="text" id="telefono" name="telefono" class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+            <div>
+              <label for="direccion" class="block mb-2 text-sm font-medium text-gray-700">Dirección:</label>
+              <input type="text" id="direccion" name="direccion" class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Datos de la Venta -->
+      <div id="sale-form" class="mb-8 hidden">
+        <fieldset class="border border-gray-200 p-6 rounded-lg">
+          <legend class="text-2xl font-semibold mb-6 text-gray-700">Datos de la Venta</legend>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label for="producto" class="block mb-2 text-sm font-medium text-gray-700">Producto:</label>
+              <input type="text" id="producto" name="producto" required class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+            <div>
+              <label for="cantidad" class="block mb-2 text-sm font-medium text-gray-700">Cantidad:</label>
+              <input type="number" id="cantidad" name="cantidad" required class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+            <div>
+              <label for="precio_total" class="block mb-2 text-sm font-medium text-gray-700">Precio Total:</label>
+              <input type="number" id="precio_total" name="precio_total" step="0.01" required class="w-full p-3 border border-gray-300 rounded-md">
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Botón de Enviar -->
+      <div class="flex justify-center">
+        <button type="submit" class="bg-blue-600 text-white p-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 transition duration-150 ease-in-out">Crear Cliente y Venta</button>
+      </div>
+    </form>
+
+    <!-- Lista de Clientes y Productos -->
+    <div class="bg-gray-50 p-6 rounded-md shadow-md mt-8">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Clientes y Productos</h2>
+      <div class="space-y-4">
+        {{#each clientes}}
+        <div class="bg-white p-4 border border-gray-200 rounded-md">
+          <h3 class="text-lg font-semibold mb-2">Cliente: {{this.nombre}}</h3>
+          <p class="text-gray-600">Email: {{this.email}}</p>
+          <p class="text-gray-600">Teléfono: {{this.telefono}}</p>
+          <p class="text-gray-600">Dirección: {{this.direccion}}</p>
+          <div class="mt-4">
+            <h4 class="text-md font-semibold mb-2">Productos Comprados:</h4>
+            <ul class="list-disc list-inside space-y-1 text-gray-700">
+              {{#each this.ventas}}
+              <li>{{this.producto}} - Cantidad: {{this.cantidad}} - Precio Total: ${{this.precio_total}}</li>
+              {{/each}}
+            </ul>
+          </div>
+          <div class="mt-4 flex space-x-2">
+           
+            <form action="/views/delete/{{this.id}}" method="post" class="inline">
+              <button type="submit" class="bg-red-500 text-white text-sm p-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">Eliminar</button>
+            </form>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('toggle-client-form').addEventListener('click', function() {
+      const clientForm = document.getElementById('client-form');
+      clientForm.classList.toggle('hidden');
+    });
+
+    document.getElementById('toggle-sale-form').addEventListener('click', function() {
+      const saleForm = document.getElementById('sale-form');
+      saleForm.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clientes</title>
+</head>
+<body>
+  <h1>Lista de Clientes</h1>
+  <ul>
+    {{#each clientes}}
+      <li>{{this.nombre}} - {{this.email}}</li>
+    {{/each}}
+  </ul>
+</body>
+</html>

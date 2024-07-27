@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model session {
+  id            BigInt    @id @default(autoincrement()) @db.BigInt
+  email         String    @unique @db.VarChar(256)
+  password      String    @db.VarChar(1024)
+  lastAccess    DateTime? @db.Timestamptz(3)
+  timesLoggedIn Int       @default(0)
+
+  type   session_type @relation(fields: [typeId], references: [id])
+  typeId Int          @db.SmallInt
+
+  status   session_status @relation(fields: [statusId], references: [id])
+  statusId Int            @db.SmallInt
+
+  rol   session_rol? @relation(fields: [rolId], references: [id])
+  rolId Int?         @db.SmallInt
+
+  user user?
+}
+
+model session_type {
+  id   Int    @id @default(autoincrement()) @db.SmallInt
+  name String @db.VarChar(256)
+
+  sessions session[]
+}
+
+model session_status {
+  id   Int    @id @default(autoincrement()) @db.SmallInt
+  name String @db.VarChar(256)
+
+  sessions session[]
+}
+
+model session_rol {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  name        String  @db.VarChar(256)
+  description String? @db.VarChar(256)
+
+  sessions session[]
+}
+
+model user {
+  id        BigInt    @id @default(autoincrement()) @db.BigInt
+  name      String?   @db.VarChar(1024)
+  lastName  String?   @db.VarChar(1024)
+  image     String?   @db.VarChar(5120)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+
+  session   session @relation(fields: [sessionId], references: [id])
+  sessionId BigInt  @unique
+}
+
+model address {
+  id     Int     @id @default(autoincrement()) @db.Integer
+  street String? @db.VarChar(1024)
+  city   String? @db.VarChar(512)
+  state  String? @db.VarChar(1024)
+
+  countryId Int?
+  country   country? @relation(fields: [countryId], references: [id])
+}
+
+model country {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(512)
+  alpha2Code       String    @db.VarChar(2)
+  alpha3Code       String    @db.VarChar(3)
+  phoneCountryCode String    @db.VarChar(8)
+  imgUrl           String?   @db.VarChar(2048)
+  address          address[]
+}
+
+model Cliente {
+  id        Int     @id @default(autoincrement())
+  nombre    String
+  email     String
+  telefono  String?
+  direccion String?
+  ventas    Venta[] @relation("ClienteVentas")
+}
+
+model Venta {
+  id           Int      @id @default(autoincrement())
+  cliente_id   Int
+  fecha_venta  DateTime
+  producto     String
+  cantidad     Int
+  precio_total Decimal  @db.Decimal(10, 2)
+
+  cliente Cliente @relation("ClienteVentas", fields: [cliente_id], references: [id])
+
+  @@index([cliente_id])
+}
